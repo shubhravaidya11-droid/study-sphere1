@@ -125,13 +125,37 @@ h1 {
 <nav class="navbar">
   <div class="nav-container">
     <div class="logo">study sphere</div>
-    <ul class="nav-links">
-<li><a href="index.html">Home</a></li>
+
+    <!-- Desktop nav -->
+    <ul class="nav-links" aria-label="Primary navigation">
+      <li><a href="index.html">Home</a></li>
       <li><a href="work.html">How it works</a></li>
       <li><a href="tools.html">About Tools</a></li>
       <li><a href="registration.html">Register</a></li>
       <li><a href="login.html">login</a></li>
     </ul>
+
+    <!-- Mobile hamburger -->
+    <button
+      class="nav-hamburger"
+      type="button"
+      aria-label="Open navigation menu"
+      aria-controls="mobile-menu"
+      aria-expanded="false"
+    >
+      <span aria-hidden="true" class="hamburger-lines"></span>
+    </button>
+
+    <!-- Mobile dropdown -->
+    <div id="mobile-menu" class="mobile-menu" role="dialog" aria-modal="false">
+      <ul class="mobile-links" aria-label="Mobile navigation links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="work.html">How it works</a></li>
+        <li><a href="tools.html">About Tools</a></li>
+        <li><a href="registration.html">Register</a></li>
+        <li><a href="login.html">login</a></li>
+      </ul>
+    </div>
   </div>
 </nav>
 
@@ -205,6 +229,7 @@ const observer = new IntersectionObserver((entries) => {
 
 steps.forEach(step => observer.observe(step));
 </script>
+<script src="nav-mobile.js" defer></script>
 <script src="cursor-mouse.js" defer></script>
 </body>
 </html>
