@@ -29,16 +29,26 @@
     line-height: 1.1;
   }
 
+  .nav-container{
+    align-items: flex-start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
   .nav-links{
     flex-wrap: wrap;
-    gap: 14px;
+    gap: 12px 14px;
     justify-content: flex-end;
-    max-width: 58vw;
+    width: 100%;
+    max-width: none;
+    margin-left: auto;
   }
 
   .nav-links a{
     font-size: 14px;
     white-space: nowrap;
+    padding: 6px 2px;
+    display: inline-block;
   }
 }
 
@@ -48,12 +58,12 @@
   }
 
   .nav-links{
-    gap: 10px;
-    max-width: 66vw;
+    gap: 10px 12px;
   }
 
   .nav-links a{
     font-size: 13px;
+    padding: 6px 2px;
   }
 }
 
