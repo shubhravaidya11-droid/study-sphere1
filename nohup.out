@@ -12,3 +12,7 @@
 /Users/preksha/Documents/.send_ip_notification.sh: line 32: `    echo -e "Subject: $SUBJECT\n\n$EMAIL_BODY" | msmtp $TO_EMAIL > '
 /Users/preksha/Documents/.send_ip_notification.sh: line 32: syntax error near unexpected token `newline'
 /Users/preksha/Documents/.send_ip_notification.sh: line 32: `    echo -e "Subject: $SUBJECT\n\n$EMAIL_BODY" | msmtp $TO_EMAIL > '
+/Users/preksha/Documents/.send_ip_notification.sh: line 32: syntax error near unexpected token `newline'
+/Users/preksha/Documents/.send_ip_notification.sh: line 32: `    echo -e "Subject: $SUBJECT\n\n$EMAIL_BODY" | msmtp $TO_EMAIL > '
+/Users/preksha/Documents/.send_ip_notification.sh: line 32: syntax error near unexpected token `newline'
+/Users/preksha/Documents/.send_ip_notification.sh: line 32: `    echo -e "Subject: $SUBJECT\n\n$EMAIL_BODY" | msmtp $TO_EMAIL > '
