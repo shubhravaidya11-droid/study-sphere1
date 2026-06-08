@@ -12,18 +12,24 @@ body{
         #3b1022,
         #4a1628
     );
-    cursor: none; /* hide default cursor */
+    cursor: auto; /* keep native cursor on touch devices (mobile) */
 
     min-height:100vh;
     padding:40px;
 }
 
-/* Custom cursor dot */
+/* Custom cursor dot (hide on mobile/touch) */
 .custom-cursor{
     pointer-events: none;
     z-index: 999999;
     position: fixed;
 }
+
+@media (hover: none) and (pointer: coarse){
+    .custom-cursor{ display: none !important; }
+}
+
+
 
 .features{
     max-width:1400px;
