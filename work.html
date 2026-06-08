@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How It Works: Find Your Perfect Study Crew</title>
+
+<link rel="stylesheet" href="sphere.css">
+
+<style>
+/* ====== GLOBAL ====== */
+body {
+  margin: 0;
+  padding-top: 80px; /* fixed navbar offset */
+  font-family: 'Segoe UI', sans-serif;
+  background: #5b1f2a; /* dark maroon */
+  color: #f5c6a5; /* peach */
+  text-align: center;
+}
+
+
+h1 {
+  font-size: 42px;
+  margin-top: 40px;
+}
+
+.subtitle {
+  max-width: 700px;
+  margin: 10px auto 50px;
+  font-size: 18px;
+  opacity: 0.85;
+}
+
+/* ====== STEPS CONTAINER ====== */
+.steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 20px;
+}
+
+/* ====== STEP BOX ====== */
+.step {
+  width: 220px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
+}
+
+/* Scroll animation active */
+.step.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ====== CIRCLE ====== */
+.circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 6px solid #f5c6a5;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  
+  /* Floating animation */
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Floating effect */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* ====== TEXT ====== */
+.step h3 {
+  margin: 10px 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.step p {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* ====== ARROWS ====== */
+.arrow {
+  font-size: 30px;
+  align-self: center;
+}
+
+/* ====== FOOTER ====== */
+.footer {
+  margin: 60px auto;
+  max-width: 800px;
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* Responsive */
+@media(max-width: 900px) {
+  .steps {
+    flex-direction: column;
+  }
+  .arrow {
+    transform: rotate(90deg);
+  }
+  .linked a{
+    text-decoration: none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!--nav section-->
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="logo">study sphere</div>
+    <ul class="nav-links">
+      <li><a href="sphere.html">Home</a></li>
+      <li><a href="work.html">How it works</a></li>
+      <li><a href="tools.html">About Tools</a></li>
+      <li><a href="registration.html">Register</a></li>
+      <li><a href="login.html">login</a></li>
+    </ul>
+  </div>
+</nav>
+
+<h1>How It Works: Find Your Perfect Study Crew</h1>
+
+
+<p class="subtitle">
+StudySphere takes the guesswork out of forming study groups
+</p>
+
+<div class="steps">
+
+  <div class="step">
+    <div class="circle">👤</div>
+    <h3><a href="registration.html" style="text-decoration: underline; color: #f5c6a5;" class="linked">Register</a></h3>
+    <p>Create your account in just a few simple steps. Add your basic details and set up your student profile. This helps us understand your academic needs. You’ll be ready to start in minutes.</p>
+  </div>
+
+  <div class="arrow">➜</div>
+
+  <div class="step">
+    <div class="circle">📘</div>
+    <h3>Select Subjects</h3>
+    <p>Choose the subjects you want to study. You can pick multiple topics based on your goals. This helps match you with students who share similar interests. It ensures focused and productive sessions.</p>
+  </div>
+
+  <div class="arrow">➜</div>
+
+  <div class="step">
+    <div class="circle">📅</div>
+    <h3>Set Availability</h3>
+    <p>Tell us when you’re available to study. Set your preferred time slots easily. This allows the system to find compatible schedules. No more back-and-forth coordination.</p>
+  </div>
+
+  <div class="arrow">➜</div>
+
+  <div class="step">
+    <div class="circle">🔀</div>
+    <h3>Get Matched</h3>
+    <p>Our smart system connects you with the right group. It considers subjects, timing, and preferences. You’ll be matched with like-minded learners. This increases productivity and motivation.</p>
+  </div>
+
+  <div class="arrow">➜</div>
+
+  <div class="step">
+    <div class="circle">🤝</div>
+    <h3>Connect & Study</h3>
+    <p>Join your study group and start learning together. Share ideas, solve problems, and stay motivated. Collaboration makes studying more effective. Achieve your goals faster with your crew.</p>
+  </div>
+
+</div>
+
+<div class="footer">
+Our smart algorithm does the heavy lifting — matching you based on subjects, schedules, and learning preferences in seconds.
+</div>
+
+<script>
+/* ===== Scroll Animation ===== */
+const steps = document.querySelectorAll('.step');
+
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, index) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        entry.target.classList.add('show');
+      }, index * 200); // stagger effect
+    }
+  });
+}, { threshold: 0.3 });
+
+steps.forEach(step => observer.observe(step));
+</script>
+<script src="cursor-mouse.js"></script>
+</body>
+</html>

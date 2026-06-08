@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Sphere — Study Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sphere.css">
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg1: #200006;
+  --bg2: #5a0016;
+  --bg3: #8b1a3d;
+  --bg: #06080f;
+  --surface: #0c0f1a;
+  --card: #0f1220;
+  --card2: #121525;
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --text: #eef2ff;
+  --muted: #5a6480;
+  --muted2: #8492b4;
+
+  --notes: #38bdf8;
+  --notes-bg: rgba(56,189,248,0.08);
+  --white: #f0f4ff;
+  --board: #fb7185;
+  --board-bg: rgba(251,113,133,0.08);
+  --flash: #fbbf24;
+  --flash-bg: rgba(251,191,36,0.08);
+  --todo: #34d399;
+  --todo-bg: rgba(52,211,153,0.08);
+  --pomo: #c084fc;
+  --pomo-bg: rgba(192,132,252,0.08);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  padding-top: 80px; /* fixed navbar offset */
+  background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+
+/* ── NOISE ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: 0.5;
+}
+
+/* ── GRID BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── WRAPPER ── */
+.page {
+  position: relative; z-index: 1;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 80px 24px 100px;
+}
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  margin-bottom: 72px;
+  opacity: 0;
+  animation: rise 0.8s 0.1s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 16px;
+  border-radius: 100px;
+  border: 1px solid rgba(56,189,248,0.25);
+  background: rgba(56,189,248,0.07);
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--notes);
+  margin-bottom: 22px;
+}
+.pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--notes); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.header h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 18px;
+}
+.header h2 em {
+  font-style: normal;
+  background: linear-gradient(120deg, var(--notes) 0%, var(--pomo) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.header p {
+  color: var(--muted2);
+  font-size: 1rem; font-weight: 300; line-height: 1.75;
+  max-width: 480px; margin: 0 auto;
+}
+
+/* ── BENTO GRID ── */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto;
+  gap: 16px;
+}
+
+.bento-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.34,1.4,0.64,1), border-color 0.35s, box-shadow 0.4s;
+  opacity: 0;
+  transform: translateY(32px) scale(0.97);
+}
+.bento-card.show {
+  animation: card-rise 0.65s cubic-bezier(0.34,1.2,0.64,1) forwards;
+}
+.bento-card:nth-child(1){animation-delay:0s}
+.bento-card:nth-child(2){animation-delay:0.09s}
+.bento-card:nth-child(3){animation-delay:0.18s}
+.bento-card:nth-child(4){animation-delay:0.27s}
+.bento-card:nth-child(5){animation-delay:0.36s}
+
+@keyframes card-rise {
+  to { opacity:1; transform: translateY(0) scale(1); }
+}
+
+/* Glow layer */
+.bento-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.bento-card:hover { transform: translateY(-5px) scale(1.01); }
+
+/* Card sizing */
+.card-notes   { grid-column: span 7; }
+.card-board   { grid-column: span 5; }
+.card-flash   { grid-column: span 4; }
+.card-todo    { grid-column: span 5; }
+.card-pomo    { grid-column: span 3; }
+
+@media(max-width:860px){
+  .card-notes,.card-board,.card-flash,.card-todo,.card-pomo { grid-column: span 12; }
+}
+
+/* Per-card theming */
+.card-notes::before { background: radial-gradient(ellipse at 0% 0%, rgba(56,189,248,0.1), transparent 60%); }
+.card-board::before { background: radial-gradient(ellipse at 100% 0%, rgba(251,113,133,0.1), transparent 60%); }
+.card-flash::before { background: radial-gradient(ellipse at 0% 100%, rgba(251,191,36,0.1), transparent 60%); }
+.card-todo::before  { background: radial-gradient(ellipse at 50% 50%, rgba(52,211,153,0.1), transparent 60%); }
+.card-pomo::before  { background: radial-gradient(ellipse at 100% 100%, rgba(192,132,252,0.1), transparent 60%); }
+
+.card-notes:hover  { border-color: rgba(56,189,248,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.card-board:hover  { border-color: rgba(251,113,133,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.card-flash:hover  { border-color: rgba(251,191,36,0.3);  box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.card-todo:hover   { border-color: rgba(52,211,153,0.3);  box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.card-pomo:hover   { border-color: rgba(192,132,252,0.3);  box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.bento-card:hover::before { opacity: 1; }
+
+/* Card header */
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.card-icon-wrap {
+  width: 44px; height: 44px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.card-notes .card-icon-wrap  { background: var(--notes-bg); border: 1px solid rgba(56,189,248,0.2); }
+.card-board .card-icon-wrap  { background: var(--board-bg); border: 1px solid rgba(251,113,133,0.2); }
+.card-flash .card-icon-wrap  { background: var(--flash-bg); border: 1px solid rgba(251,191,36,0.2); }
+.card-todo  .card-icon-wrap  { background: var(--todo-bg);  border: 1px solid rgba(52,211,153,0.2); }
+.card-pomo  .card-icon-wrap  { background: var(--pomo-bg);  border: 1px solid rgba(192,132,252,0.2); }
+
+.card-label {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 100px;
+}
+.card-notes .card-label  { background: var(--notes-bg); color: var(--notes); }
+.card-board .card-label  { background: var(--board-bg); color: var(--board); }
+.card-flash .card-label  { background: var(--flash-bg); color: var(--flash); }
+.card-todo  .card-label  { background: var(--todo-bg);  color: var(--todo);  }
+.card-pomo  .card-label  { background: var(--pomo-bg);  color: var(--pomo);  }
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem; font-weight: 700; letter-spacing: -0.01em;
+  margin-bottom: 6px; font-style: italic;
+}
+.card-notes .card-title  { color: #bae6fd; }
+.card-board .card-title  { color: #fecdd3; }
+.card-flash .card-title  { color: #fef3c7; }
+.card-todo  .card-title  { color: #a7f3d0; }
+.card-pomo  .card-title  { color: #e9d5ff; }
+
+.card-desc {
+  color: var(--muted2);
+  font-size: 0.85rem; font-weight: 300; line-height: 1.65;
+  margin-bottom: 22px;
+}
+
+/* ═══════════════════════════════
+   NOTES VISUAL
+═══════════════════════════════ */
+.notes-files {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.note-file {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  transition: all 0.3s;
+  cursor: default;
+}
+.note-file:hover { background: rgba(56,189,248,0.06); border-color: rgba(56,189,248,0.2); transform: translateX(4px); }
+.file-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; flex-shrink: 0;
+}
+.file-info { flex: 1; min-width: 0; }
+.file-name { font-size: 0.82rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-meta { font-size: 0.7rem; color: var(--muted); margin-top: 1px; }
+.file-avatars { display: flex; }
+.file-avatars span {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; font-weight: 700; color: #fff;
+  margin-left: -5px; border: 1.5px solid var(--card);
+  flex-shrink: 0;
+}
+.file-avatars span:first-child { margin-left: 0; }
+
+/* ═══════════════════════════════
+   WHITEBOARD VISUAL
+═══════════════════════════════ */
+.whiteboard {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  height: 130px;
+}
+.wb-toolbar {
+  display: flex; gap: 6px; margin-bottom: 10px;
+}
+.wb-tool {
+  width: 26px; height: 26px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  transition: all 0.2s; cursor: default;
+}
+.wb-tool:hover { background: rgba(251,113,133,0.15); border-color: rgba(251,113,133,0.3); }
+.wb-tool.active { background: rgba(251,113,133,0.15); border-color: rgba(251,113,133,0.35); }
+.wb-canvas { position: relative; height: 70px; }
+.wb-canvas svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.draw-path {
+  fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 300; stroke-dashoffset: 300;
+}
+.draw-path.animate { animation: draw-line 2s 0.5s cubic-bezier(0.4,0,0.2,1) forwards; }
+@keyframes draw-line { to { stroke-dashoffset: 0; } }
+
+/* ═══════════════════════════════
+   FLASHCARD VISUAL
+═══════════════════════════════ */
+.flashcard-wrap { perspective: 800px; }
+.flashcard {
+  width: 100%; height: 110px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);
+  cursor: pointer;
+}
+.flashcard.flipped { transform: rotateY(180deg); }
+.fc-front, .fc-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border-radius: 14px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 16px;
+  border: 1px solid var(--border);
+}
+.fc-front {
+  background: rgba(251,191,36,0.06);
+  border-color: rgba(251,191,36,0.15);
+}
+.fc-back {
+  background: rgba(251,191,36,0.12);
+  border-color: rgba(251,191,36,0.3);
+  transform: rotateY(180deg);
+}
+.fc-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--flash); margin-bottom: 6px; font-weight: 600; }
+.fc-text { font-size: 0.88rem; font-weight: 500; color: #fef3c7; line-height: 1.4; }
+.fc-hint { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
+
+.fc-controls {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 10px;
+}
+.fc-dots { display: flex; gap: 5px; }
+.fc-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+.fc-dot.active { background: var(--flash); }
+.fc-btn {
+  font-size: 0.72rem; padding: 4px 12px; border-radius: 100px;
+  border: 1px solid rgba(251,191,36,0.25);
+  background: rgba(251,191,36,0.08); color: var(--flash);
+  cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500;
+  transition: all 0.2s;
+}
+.fc-btn:hover { background: rgba(251,191,36,0.18); transform: scale(1.05); }
+
+/* ═══════════════════════════════
+   KANBAN VISUAL
+═══════════════════════════════ */
+.kanban { display: flex; gap: 10px; }
+.kanban-col { flex: 1; }
+.kanban-col-header {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em;
+  text-transform: uppercase; margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.k-count {
+  width: 18px; height: 18px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem;
+}
+.col-todo .kanban-col-header  { color: var(--muted2); }
+.col-doing .kanban-col-header { color: var(--flash); }
+.col-done .kanban-col-header  { color: var(--todo); }
+.col-todo .k-count  { background: rgba(255,255,255,0.06); color: var(--muted2); }
+.col-doing .k-count { background: var(--flash-bg); color: var(--flash); }
+.col-done .k-count  { background: var(--todo-bg);  color: var(--todo); }
+
+.k-task {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 9px; padding: 9px 10px;
+  margin-bottom: 7px;
+  font-size: 0.75rem; line-height: 1.4;
+  transition: all 0.25s;
+  cursor: pointer;
+}
+.k-task:hover { transform: translateY(-2px); background: rgba(52,211,153,0.05); border-color: rgba(52,211,153,0.2); }
+.k-task.k-done { text-decoration: line-through; opacity: 0.5; }
+.k-task-label { font-weight: 500; color: var(--text); margin-bottom: 5px; }
+.k-task-meta { display: flex; align-items: center; justify-content: space-between; }
+.k-tag {
+  font-size: 0.62rem; padding: 2px 7px; border-radius: 100px; font-weight: 600;
+}
+.k-done-tag { background: rgba(52,211,153,0.08); color: var(--todo); }
+.k-avatar {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+
+/* ═══════════════════════════════
+   POMODORO VISUAL
+═══════════════════════════════ */
+.pomo-wrap { text-align: center; }
+.pomo-ring { width: 100px; height: 100px; position: relative; margin: 0 auto 14px; }
+.pomo-ring svg { transform: rotate(-90deg); }
+.pomo-track { fill: none; stroke: rgba(192,132,252,0.1); stroke-width: 6; }
+.pomo-progress {
+  fill: none; stroke: var(--pomo); stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 251;
+  stroke-dashoffset: 251;
+  transition: stroke-dashoffset 1s linear;
+  filter: drop-shadow(0 0 6px rgba(192,132,252,0.5));
+}
+.pomo-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.pomo-time {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--pomo); line-height: 1;
+}
+.pomo-phase { font-size: 0.62rem; color: var(--muted); font-weight: 500; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.07em; }
+.pomo-controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; }
+.pomo-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+  border: 1px solid rgba(192,132,252,0.25);
+  background: rgba(192,132,252,0.08);
+  cursor: pointer; transition: all 0.2s; color: var(--pomo);
+}
+.pomo-btn:hover { background: rgba(192,132,252,0.2); transform: scale(1.1); }
+.pomo-btn.active { background: var(--pomo); color: #fff; box-shadow: 0 0 16px rgba(192,132,252,0.4); }
+.pomo-members { display: flex; justify-content: center; align-items: center; gap: 4px; font-size: 0.68rem; color: var(--muted); }
+.pomo-faces { display: flex; }
+.pomo-faces span {
+  width: 18px; height: 18px; border-radius: 50%;
+  font-size: 0.55rem; font-weight: 700; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  margin-left: -4px; border: 1.5px solid var(--bg); flex-shrink: 0;
+}
+.pomo-faces span:first-child { margin-left: 0; }
+
+/* ── ANIMATIONS ── */
+@keyframes rise {
+  from { opacity:0; transform: translateY(24px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!--nav section-->
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="logo">study sphere</div>
+    <ul class="nav-links">
+      <li><a href="sphere.html">Home</a></li>
+      <li><a href="work.html">How it works</a></li>
+      <li><a href="tools.html">About Tools</a></li>
+      <li><a href="registration.html">Register</a></li>
+      <li><a href="login.html">login</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page">
+
+
+  <div class="header">
+    <div class="pill"><span class="pill-dot"></span>Study Tools</div>
+    <h2>Everything you need.<br><em>All in one place.</em></h2>
+    <p>Powerful tools built for students — from shared notes to synced focus timers, collaboration has never felt this good.</p>
+  </div>
+
+  <div class="bento">
+
+    <!-- ① SHARED NOTES -->
+    <div class="bento-card card-notes">
+      <div class="card-top">
+        <div class="card-icon-wrap">📄</div>
+        <span class="card-label">Notes & Docs</span>
+      </div>
+      <div class="card-title">"One doc. Every mind in the room."</div>
+      <p class="card-desc">Upload, edit, and organize files together in real time. No email chains, no lost versions.</p>
+      <div class="notes-files">
+        <div class="note-file">
+          <div class="file-icon" style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2);">📘</div>
+          <div class="file-info">
+            <div class="file-name">Calculus — Chapter 5 Notes.pdf</div>
+            <div class="file-meta">Edited 3 min ago · 2.4 MB</div>
+          </div>
+          <div class="file-avatars">
+            <span style="background:linear-gradient(135deg,#38bdf8,#818cf8)">A</span>
+            <span style="background:linear-gradient(135deg,#f472b6,#fb7185)">S</span>
+            <span style="background:linear-gradient(135deg,#34d399,#059669)">M</span>
+          </div>
+        </div>
+        <div class="note-file">
+          <div class="file-icon" style="background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.2);">📗</div>
+          <div class="file-info">
+            <div class="file-name">Biology — Cell Division Summary.docx</div>
+            <div class="file-meta">Edited 1 hr ago · 840 KB</div>
+          </div>
+          <div class="file-avatars">
+            <span style="background:linear-gradient(135deg,#fbbf24,#f97316)">J</span>
+            <span style="background:linear-gradient(135deg,#c084fc,#818cf8)">L</span>
+          </div>
+        </div>
+        <div class="note-file">
+          <div class="file-icon" style="background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.2);">📙</div>
+          <div class="file-info">
+            <div class="file-name">Physics — Electromagnetism Slides.pptx</div>
+            <div class="file-meta">Uploaded today · 5.1 MB</div>
+          </div>
+          <div class="file-avatars">
+            <span style="background:linear-gradient(135deg,#38bdf8,#6366f1)">R</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② WHITEBOARD -->
+    <div class="bento-card card-board">
+      <div class="card-top">
+        <div class="card-icon-wrap">🖊️</div>
+        <span class="card-label">Whiteboard</span>
+      </div>
+      <div class="card-title">"Sketch it, solve it, share it."</div>
+      <p class="card-desc">Draw diagrams and work through problems together — live, in the same space.</p>
+
+      <div class="whiteboard">
+        <div class="wb-toolbar" aria-label="Whiteboard tools">
+          <div class="wb-tool active" data-tool="pen">✏️</div>
+          <div class="wb-tool" data-tool="square">⬜</div>
+          <div class="wb-tool" data-tool="circle">⭕</div>
+          <div class="wb-tool" data-tool="arrow">↗️</div>
+          <div class="wb-tool" data-tool="eraser">🧹</div>
+          <div style="flex:1"></div>
+          <div class="wb-tool" data-tool="undo">↩️</div>
+        </div>
+
+        <div class="wb-canvas">
+          <svg viewBox="0 0 300 70" role="img" aria-label="Sketch preview">
+            <path class="draw-path" id="wbPath" stroke="rgba(251,113,133,0.7)"
+              d="M10,35 C30,10 50,10 70,35 C90,60 110,60 130,35 C150,10 170,10 190,35 C210,60 230,60 250,35 C270,10 285,18 295,35"/>
+            <text x="130" y="18" fill="rgba(251,113,133,0.5)" font-size="9" font-family="DM Sans">sin(x)</text>
+            <line x1="8" y1="35" x2="298" y2="35" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <line x1="10" y1="5" x2="10" y2="65" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <circle cx="70" cy="35" r="3" fill="rgba(56,189,248,0.7)"/>
+            <circle cx="190" cy="35" r="3" fill="rgba(56,189,248,0.7)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ FLASHCARDS -->
+    <div class="bento-card card-flash">
+      <div class="card-top">
+        <div class="card-icon-wrap">🗂️</div>
+        <span class="card-label">Flashcards</span>
+      </div>
+      <div class="card-title">"Flip. Recall. Improve."</div>
+      <p class="card-desc" style="margin-bottom:14px;">Tap to flip. Use next/prev to browse.</p>
+
+      <div class="flashcard-wrap">
+        <div class="flashcard" id="flashcard" role="button" tabindex="0" aria-label="Flashcard">
+          <div class="fc-front">
+            <div class="fc-label">Front</div>
+            <div class="fc-text" id="fcFrontText">What is the derivative of sin(x)?</div>
+            <div class="fc-hint">Tap to reveal</div>
+          </div>
+          <div class="fc-back">
+            <div class="fc-label">Back</div>
+            <div class="fc-text" id="fcBackText">d/dx sin(x) = cos(x)</div>
+            <div class="fc-hint">Nice!</div>
+          </div>
+        </div>
+
+        <div class="fc-controls">
+          <div class="fc-dots" id="fcDots" aria-hidden="true">
+            <span class="fc-dot active"></span>
+            <span class="fc-dot"></span>
+            <span class="fc-dot"></span>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="fc-btn" id="fcPrev" type="button">Prev</button>
+            <button class="fc-btn" id="fcNext" type="button">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ TODO / KANBAN -->
+    <div class="bento-card card-todo">
+      <div class="card-top">
+        <div class="card-icon-wrap">✅</div>
+        <span class="card-label">Kanban</span>
+      </div>
+      <div class="card-title">"Move tasks forward."</div>
+      <p class="card-desc" style="margin-bottom:14px;">Click a task to mark it done/undone.</p>
+
+      <div class="kanban" id="kanban">
+        <div class="kanban-col col-todo">
+          <div class="kanban-col-header">
+            <span>To do</span>
+            <span class="k-count" id="cntTodo">2</span>
+          </div>
+          <div class="k-task" data-done="0">
+            <div class="k-task-label">Solve integrals (Ch.5)</div>
+            <div class="k-task-meta">
+              <span class="k-tag">Focus</span>
+              <span class="k-avatar" style="background:#38bdf8;">A</span>
+            </div>
+          </div>
+          <div class="k-task" data-done="0">
+            <div class="k-task-label">Revise Newton’s laws</div>
+            <div class="k-task-meta">
+              <span class="k-tag">Review</span>
+              <span class="k-avatar" style="background:#34d399;">M</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col col-doing">
+          <div class="kanban-col-header">
+            <span>Doing</span>
+            <span class="k-count" id="cntDoing">1</span>
+          </div>
+          <div class="k-task" data-done="0">
+            <div class="k-task-label">Practice flashcards</div>
+            <div class="k-task-meta">
+              <span class="k-tag">Quick</span>
+              <span class="k-avatar" style="background:#fbbf24;">J</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col col-done">
+          <div class="kanban-col-header">
+            <span>Done</span>
+            <span class="k-count" id="cntDone">0</span>
+          </div>
+          <!-- empty on purpose -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑤ POMODORO -->
+    <div class="bento-card card-pomo">
+      <div class="card-top">
+        <div class="card-icon-wrap">⏳</div>
+        <span class="card-label">Pomodoro</span>
+      </div>
+      <div class="card-title">"Stay in flow."</div>
+      <p class="card-desc" style="margin-bottom:14px;">Start focus sessions and keep momentum.</p>
+
+      <div class="pomo-wrap" id="pomo">
+        <div class="pomo-ring">
+          <svg width="100" height="100" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="pomo-track" cx="50" cy="50" r="45"></circle>
+            <circle class="pomo-progress" id="pomoProg" cx="50" cy="50" r="45"></circle>
+          </svg>
+          <div class="pomo-center">
+            <div class="pomo-time" id="pomoTime">25:00</div>
+            <div class="pomo-phase" id="pomoPhase">Focus</div>
+          </div>
+        </div>
+
+        <div class="pomo-controls">
+          <button class="pomo-btn active" type="button" id="pomoPlay">▶</button>
+          <button class="pomo-btn" type="button" id="pomoPause">⏸</button>
+          <button class="pomo-btn" type="button" id="pomoReset">↺</button>
+        </div>
+
+        <div class="pomo-members">
+          <span class="pomo-faces">
+            <span style="background:#38bdf8">A</span>
+            <span style="background:#c084fc">L</span>
+            <span style="background:#fb7185">S</span>
+          </span>
+          <span style="margin-left:8px;">3 studying</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Intersection-based card reveal
+  const cards = document.querySelectorAll('.bento-card');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('show');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  cards.forEach(c => obs.observe(c));
+
+  // Whiteboard sketch animation
+  const wb = document.querySelector('.card-board');
+  const wbPath = document.getElementById('wbPath');
+  if (wbPath) {
+    const wbObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          wbPath.classList.add('animate');
+          wbObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    wbObs.observe(wb);
+  }
+
+  // Flashcards
+  const deck = [
+    { front: 'What is the derivative of sin(x)?', back: 'd/dx sin(x) = cos(x)' },
+    { front: 'Integral of 1/x is?', back: '∫(1/x) dx = ln|x| + C' },
+    { front: 'Euler’s formula relates:', back: 'e^(iθ) = cosθ + i sinθ' },
+  ];
+  let fcIndex = 0;
+  const flashcard = document.getElementById('flashcard');
+  const fcFrontText = document.getElementById('fcFrontText');
+  const fcBackText = document.getElementById('fcBackText');
+  const fcPrev = document.getElementById('fcPrev');
+  const fcNext = document.getElementById('fcNext');
+  const fcDots = document.getElementById('fcDots');
+  const fcDotEls = fcDots ? Array.from(fcDots.querySelectorAll('.fc-dot')) : [];
+
+  function renderFlash() {
+    const item = deck[fcIndex];
+    fcFrontText.textContent = item.front;
+    fcBackText.textContent = item.back;
+    if (fcDotEls.length) {
+      fcDotEls.forEach((d, i) => d.classList.toggle('active', i === fcIndex));
+    }
+    flashcard.classList.remove('flipped');
+  }
+  renderFlash();
+
+  flashcard?.addEventListener('click', () => {
+    flashcard.classList.toggle('flipped');
+  });
+  flashcard?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      flashcard.classList.toggle('flipped');
+    }
+  });
+
+  fcPrev?.addEventListener('click', () => {
+    fcIndex = (fcIndex - 1 + deck.length) % deck.length;
+    renderFlash();
+  });
+  fcNext?.addEventListener('click', () => {
+    fcIndex = (fcIndex + 1) % deck.length;
+    renderFlash();
+  });
+
+  // Kanban toggle + counts
+  const kanban = document.getElementById('kanban');
+  const cntTodo = document.getElementById('cntTodo');
+  const cntDoing = document.getElementById('cntDoing');
+  const cntDone = document.getElementById('cntDone');
+
+  function updateCounts() {
+    if (!kanban) return;
+    const todoCol = kanban.querySelector('.col-todo');
+    const doingCol = kanban.querySelector('.col-doing');
+    const doneCol = kanban.querySelector('.col-done');
+
+    const todoTasks = todoCol ? todoCol.querySelectorAll('.k-task:not(.k-done)') : [];
+    const doingTasks = doingCol ? doingCol.querySelectorAll('.k-task:not(.k-done)') : [];
+    const doneTasks = doneCol ? doneCol.querySelectorAll('.k-task.k-done') : [];
+
+    cntTodo && (cntTodo.textContent = String(todoTasks.length));
+    cntDoing && (cntDoing.textContent = String(doingTasks.length));
+    cntDone && (cntDone.textContent = String(doneTasks.length));
+  }
+
+  kanban?.addEventListener('click', (e) => {
+    const task = e.target.closest('.k-task');
+    if (!task) return;
+
+    const doneCol = kanban.querySelector('.col-done');
+    const todoCol = kanban.querySelector('.col-todo');
+    const doingCol = kanban.querySelector('.col-doing');
+    if (!doneCol || !todoCol || !doingCol) return;
+
+    const isDone = task.classList.contains('k-done');
+    if (isDone) {
+      // move back to To do
+      task.classList.remove('k-done');
+      todoCol.appendChild(task);
+    } else {
+      task.classList.add('k-done');
+      doneCol.appendChild(task);
+    }
+    updateCounts();
+  });
+
+  updateCounts();
+
+  // Pomodoro (client-side)
+  const pomo = document.getElementById('pomo');
+  const pomoTime = document.getElementById('pomoTime');
+  const pomoPhase = document.getElementById('pomoPhase');
+  const pomoProg = document.getElementById('pomoProg');
+  const pomoPlay = document.getElementById('pomoPlay');
+  const pomoPause = document.getElementById('pomoPause');
+  const pomoReset = document.getElementById('pomoReset');
+
+  const totalFocusSec = 25 * 60;
+  const totalBreakSec = 5 * 60;
+
+  let phase = 'focus';
+  let total = totalFocusSec;
+  let remaining = totalFocusSec;
+  let timer = null;
+
+  const radius = 45;
+  const circumference = 2 * Math.PI * radius;
+  if (pomoProg) {
+    pomoProg.style.strokeDasharray = String(circumference);
+    pomoProg.style.strokeDashoffset = String(circumference);
+  }
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  function renderPomo() {
+    const mm = Math.floor(remaining / 60);
+    const ss = remaining % 60;
+    pomoTime.textContent = `${pad2(mm)}:${pad2(ss)}`;
+
+    pomoPhase.textContent = phase === 'focus' ? 'Focus' : 'Break';
+
+    if (pomoProg) {
+      const progress = 1 - remaining / total;
+      const offset = circumference * (1 - progress);
+      pomoProg.style.strokeDashoffset = String(offset);
+    }
+
+    if (pomoPlay && pomoPause) {
+      pomoPlay.classList.toggle('active', timer === null);
+      pomoPause.classList.toggle('active', timer !== null);
+    }
+  }
+
+  function tick() {
+    if (!timer) return;
+    remaining -= 1;
+    if (remaining <= 0) {
+      if (phase === 'focus') {
+        phase = 'break';
+        total = totalBreakSec;
+        remaining = totalBreakSec;
+      } else {
+        phase = 'focus';
+        total = totalFocusSec;
+        remaining = totalFocusSec;
+      }
+    }
+    renderPomo();
+  }
+
+  function start() {
+    if (timer) return;
+    timer = setInterval(tick, 1000);
+  }
+  function pause() {
+    if (!timer) return;
+    clearInterval(timer);
+    timer = null;
+    renderPomo();
+  }
+  function reset() {
+    pause();
+    phase = 'focus';
+    total = totalFocusSec;
+    remaining = totalFocusSec;
+    renderPomo();
+  }
+
+  pomoPlay?.addEventListener('click', start);
+  pomoPause?.addEventListener('click', pause);
+  pomoReset?.addEventListener('click', reset);
+
+  renderPomo();
+</script>
+<script src="cursor-mouse.js"></script>
+</body>
+</html>
+

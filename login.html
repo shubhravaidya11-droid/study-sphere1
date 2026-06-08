@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Page</title>
+  <link rel="stylesheet" href="sphere.css">
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+
+<!--nav section-->
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="logo">study sphere</div>
+    <ul class="nav-links">
+      <li><a href="sphere.html">Home</a></li>
+      <li><a href="work.html">How it works</a></li>
+      <li><a href="tools.html">About Tools</a></li>
+      <li><a href="registration.html">Register</a></li>
+      <li><a href="login.html">login</a></li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="login-container" style="margin-top: 80px;">
+
+    <h2>Login</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required />
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    <p id="message"></p>
+  </div>
+  <script src="login.js"></script>
+  <script src="cursor-mouse.js"></script>
+</body>
+</html>
