@@ -288,7 +288,27 @@ body{
         flex-direction:column;
         align-items:stretch;
     }
+
+    .student-info h3{
+        font-size:1.35rem;
+    }
+
+    .student-info p{
+        font-size:0.95rem;
+    }
+
+    .connect-card{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .follow-btn{
+        width: 100%;
+        text-align: center;
+    }
 }
+
 
 /* --- Floating effect --- */
 .feature-card{

@@ -13,7 +13,50 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 40px;
+    gap: 16px;
 }
+
+/* Better handling for small screens */
+@media (max-width: 900px){
+  .nav-container{
+    padding: 12px 18px;
+  }
+}
+
+@media (max-width: 768px){
+  .logo{
+    font-size: 18px;
+    line-height: 1.1;
+  }
+
+  .nav-links{
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: flex-end;
+    max-width: 58vw;
+  }
+
+  .nav-links a{
+    font-size: 14px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px){
+  .nav-container{
+    padding: 10px 12px;
+  }
+
+  .nav-links{
+    gap: 10px;
+    max-width: 66vw;
+  }
+
+  .nav-links a{
+    font-size: 13px;
+  }
+}
+
 .logo{
     font-size: 22px;
     font-weight: bold;
@@ -130,4 +173,38 @@
 body {
   background-color: #3b0f2b;
   color: #f5d0b5;
+  margin: 0;
 }
+
+@media (max-width: 768px){
+  .hero{
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .overlay{
+    padding: 24px 16px;
+  }
+
+  .hero h1{
+    font-size: 30px;
+    margin-bottom: 14px;
+  }
+
+  .hero p{
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .buttons{
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .btn{
+    width: min(320px, 100%);
+    text-align: center;
+  }
+}
+
